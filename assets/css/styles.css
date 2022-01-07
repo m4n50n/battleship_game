@@ -48,7 +48,7 @@ main > div.wrapper {
   font-size: 1em;
 }
 
-#game-result {
+#game-notifications, #remaining-parts {
   display: none;
 }
 
@@ -72,7 +72,7 @@ main > div.wrapper {
 
 .square::before,
 .v_guide::before {
-  /* With this, we force the div aspect ratio to 1:1 (height = widt) */
+  /* With this, we force the div aspect ratio to 1:1 (height = width) */
   content: "";
   display: block;
   padding-top: 100%;
