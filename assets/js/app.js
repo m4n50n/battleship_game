@@ -8,14 +8,23 @@ const ShipsDefinitions = {
     frigate: 2
 }
 
-const DefaultPositions = 0;
-const RandomPositions = 1;
-
 /**
  * Multidimensional array containing the square types (0 = Empty; 1 = Part of a ship; 2 = A sunken part of a ship; 3 = A missed shot)
  * Each array corresponds to a row and each value of the array corresponds to a cell on the game board
  */
- let GameBoard = [ 
+const GameBoardState = [ 
+    [0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0]
+];
+
+const DefaultPositions = [ 
     [0,0,0,0,0,0,0,0,1],
     [1,1,1,1,1,1,0,0,1],
     [0,0,0,0,0,0,0,0,1],
@@ -26,6 +35,11 @@ const RandomPositions = 1;
     [0,0,1,0,0,0,0,0,0],
     [0,0,1,0,0,0,0,0,0]
 ];
+
+const RandomPositions = 1;
+const ManualPosition = 2;
+
+let GameBoard = []; // Main gameboard
 
 // Square types and their CSS classes
 const emptySquare = 0;
@@ -50,11 +64,19 @@ const FireModal = document.querySelector("#fire-modal");
 const ModalXCoordinateInput = document.querySelector("#x-coordinate");
 const ModalYCoordinateInput = document.querySelector("#y-coordinate");
 const GameTypeModal = document.querySelector("#game-type-modal");
+const ManualOrientationSection = document.querySelector("#manual-orientation-section");
+const ManualOrientationSelect = document.querySelector("#manual-orientation-select");
 
 // Controls
 let ShowedShips = false; // Control if the non-sunken parts of the ships are hidden or shown
-const TotalGameSquares = GameBoard.map(row => row.length).reduce((x, y) => x + y);
+const TotalGameSquares = GameBoardState.map(row => row.length).reduce((x, y) => x + y);
 const TotalShipsParts = Object.keys(ShipsDefinitions).map(ship => ShipsDefinitions[ship]).reduce((x, y) => x + y); // Sum of all parts of all ships. With reduce(), we obtain the sum of all values of the map array output
+
+const HorizontalOrientation = 1;
+const VerticalOrientation = 2;
+
+let ManualShipsPlacing = false; // Check if ship positions are being edited 
+let ActualShipWidth = 0; // Width of the ship that is beign placing manually
 // #endregion GENERAL VARIABLES
 
 // #region FUNCTIONS
@@ -63,17 +85,21 @@ const InitApp = () => {
 }
 
 const PlaceShipsPositions = (type) => {
-    if (type === RandomPositions) {
-        RestartGameBoardVariable();
-        PlaceRandomShips();
+    switch (type) {
+        case RandomPositions:
+            GameBoard = [...GameBoardState];
+            PlaceRandomShips();
+        break;
+        case ManualPosition:
+            GameBoard = [...GameBoardState];
+            PlaceShipsManually();
+        break;
+        default: 
+            GameBoard = [...DefaultPositions];
     }
 
     ShowModal(GameTypeModal, false);
     RenderBoard();
-}
-
-const RestartGameBoardVariable = () => {
-    GameBoard = GameBoard.map(row => row.map(cell => 0)); // convert all values to 0
 }
 
 const PlaceRandomShips = () => {
@@ -90,14 +116,11 @@ const PlaceRandomShips = () => {
             const ShipRenderInitCell = Math.floor(Math.random() * 9); // Random number from 0 to 8
             const ShipRenderOrientation = Math.floor(Math.random() * 2) + 1; // Random number from 1 to 2
 
-            const horizontal = 1;
-            const vertical = 2;
-
             let ConsecutiveZerosCounter = 0;
             let AvailablePlacesIndex = [];
             let Available = false;
             
-            if (ShipRenderOrientation === horizontal) {
+            if (ShipRenderOrientation === HorizontalOrientation) {
                 let row = GameBoard[ShipRenderInitRow];
                 
                 for (let i = 0; i < row.length; i++) {
@@ -126,7 +149,7 @@ const PlaceRandomShips = () => {
                     PlacedShip = !PlacedShip;
                 }
             }
-            else if (ShipRenderOrientation === vertical) { // With this feature, we will check if the boat fits on the vertical axis of GameBoard variable
+            else if (ShipRenderOrientation === VerticalOrientation) { // With this feature, we will check if the boat fits on the vertical axis of GameBoard variable
                 for (i = 0; i < GameBoard.length; i++) {
                     if (i < ShipRenderInitRow) { continue; } // We will only check starting from the random obtained row
 
@@ -160,6 +183,48 @@ const PlaceRandomShips = () => {
     console.log(GameBoard);
 }
 
+const PlaceShipsManually = () => {
+    for (const ship in ShipsDefinitions) {
+        ActualShipWidth = ShipsDefinitions[ship];
+        PlacingManualPosition();
+        SetUserNotifications(`Set the '${ship}' position (${ActualShipWidth} squares)`);
+    }
+}
+
+const PlacingManualPosition = () => {
+    ManualShipsPlacing = true;
+    ManualOrientationSection.style.display = "flex";   
+}
+
+GameBoardContainer.addEventListener("mouseover", (e) => {
+    if (e.target.classList.contains("square") && ManualShipsPlacing) {
+        for (const hovered of document.querySelectorAll(".hover")) {
+            hovered.classList.remove("hover");
+        }
+
+        let xCoordinate = parseInt(e.target.dataset.x); // x coordinate of hovered item
+        let yCoordinate = parseInt(e.target.dataset.y); // y coordinate of hovered item
+
+        let CounterHovered = 0;
+        switch (parseInt(ManualOrientationSelect.value)) {
+            case HorizontalOrientation:
+                let AxisXElements = document.querySelectorAll(`.square[data-y="${yCoordinate}"]`); // Get all squares in row (x axis)
+
+                for (const element of AxisXElements) {
+                    if (parseInt(element.dataset.x) >= xCoordinate && CounterHovered < ActualShipWidth) { element.classList.add("hover"); CounterHovered++; }
+                }
+            break;
+            case VerticalOrientation:
+                let AxisYElements = document.querySelectorAll(`.square[data-x="${xCoordinate}"]`); // Get all squares in vertical row (y axis)
+                
+                for (const element of AxisYElements) {
+                    if (parseInt(element.dataset.y) >= yCoordinate && CounterHovered < ActualShipWidth) { element.classList.add("hover"); CounterHovered++; }
+                }
+            break;
+        }
+    }
+});
+
 const RenderBoard = () => {
     let board = `<div class="blank_guide"></div>`; // blank square from the upper left corner
     
@@ -181,7 +246,7 @@ const RenderBoard = () => {
             
             const StyleBoard = (squareType === sunkenPart || squareType === missingShot) ? squareType : emptySquare;
             const showShipValue = (ShowedShips && (squareType === shipPart || squareType === sunkenPart)) ? shipPart : emptySquare;
-            board += `<div class="square ${SquareStyles[StyleBoard]} ${SquareStyles[showShipValue]}" onclick="FireShip(${y}, ${x})"></div>`;
+            board += `<div data-x="${x}" data-y="${y}" class="square ${SquareStyles[StyleBoard]} ${SquareStyles[showShipValue]}" onclick="FireShip(${y}, ${x})"></div>`;
         });
     });
 

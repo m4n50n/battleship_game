@@ -33,6 +33,14 @@ p {
   min-height: 100vh;
 }
 
+#manual-orientation-section {
+  display: none;
+}
+
+#manual-orientation-section .input-group {
+  width: fit-content;
+}
+
 main > div.wrapper {
   padding-left: 1em;
   padding-right: 2em;
@@ -65,7 +73,7 @@ main > div.wrapper {
   border: 0.5px solid #d1d1d1;
 }
 
-.square:hover {
+.square:hover, .square.hover {
   background-color: #dadada;
   cursor: pointer;
 }
