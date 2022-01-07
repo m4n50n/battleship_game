@@ -27,7 +27,7 @@
         <p>Destroy all!💣</p>        
         <p class="bg-primary px-2 text-white rounded-3 shadow-sm" id="remaining-parts">- <span class="fw-bold"></span> Ship parts remaining -</p>        
 
-        <h1 class="d-inline-block bg-white rounded-3 px-3 shadow-sm" id="game-notifications"></h1>
+        <h1 class="d-inline-block bg-white rounded-3 px-3 shadow-sm text-warning" id="game-notifications"></h1>
       </div>
     </header>
 
@@ -37,7 +37,7 @@
       </div>
 
       <div class="col-12 mt-4 d-flex justify-content-center align-items-center align-content-center gap-2">
-        <button type="button" class="btn btn-sm btn-light shadow-sm fw-bold" onclick="FireInput()"><i class="fas fa-bomb"></i> Fire</button>
+        <button type="button" class="btn btn-sm btn-light shadow-sm fw-bold" onclick="FireInput()" id="fire-input-button"><i class="fas fa-bomb"></i> Fire</button>
         <button type="button" class="btn btn-sm btn-light shadow-sm" onclick="ShowShips()"><i class="fas fa-ship"></i> <span class="show_ships fw-bold">Show</span> Ships</button>
         <button type="button" class="btn btn-sm btn-warning shadow-sm" onclick="location.reload()"><i class="fas fa-redo-alt"></i> Restart</button>
       </div>

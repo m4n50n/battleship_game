@@ -16,12 +16,12 @@ const RandomPositions = 1;
  * Each array corresponds to a row and each value of the array corresponds to a cell on the game board
  */
  let GameBoard = [ 
-    [1,1,1,1,1,0,0,0,1],
     [0,0,0,0,0,0,0,0,1],
+    [1,1,1,1,1,1,0,0,1],
     [0,0,0,0,0,0,0,0,1],
     [0,0,0,0,0,0,0,0,1],
     [0,0,0,1,1,0,0,0,1],
-    [0,0,0,0,0,0,0,0,0],
+    [0,0,1,0,0,0,0,0,0],
     [0,0,1,0,0,0,1,1,1],
     [0,0,1,0,0,0,0,0,0],
     [0,0,1,0,0,0,0,0,0]
@@ -245,8 +245,6 @@ const ShowModal = (modal, show) => {
 const ShowUserNotifications = (show = false) => {
     if (!show) { GameUserNotifications.style.display = "none";  return false; }
 
-    const RandomColor = "#" + Math.floor(Math.random() * 16777215).toString(16); // https://gist.github.com/hafizhrf/95eeb5bba6c5fe48fd54fbea0cf0eda0
-    GameUserNotifications.style.color = RandomColor;
     GameUserNotifications.style.display = "block";
 }
 
@@ -257,6 +255,7 @@ const SetUserNotifications = (notification) => {
 
 const FinishedGame = () => {
     document.querySelectorAll(".square").forEach(div => div.classList.add("block")); // Disable events in all game squares
+    document.querySelector("#fire-input-button").disabled = true;
 }
 // #endregion FUNCTIONS
 
