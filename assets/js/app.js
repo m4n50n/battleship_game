@@ -120,7 +120,7 @@ const PlaceRandomShips = () => {
 
                 if (Available) {
                     AvailablePlacesIndex.map(available_cell_index => {
-                        GameBoard[ShipRenderInitRow][available_cell_index] = ShipWidth;
+                        GameBoard[ShipRenderInitRow][available_cell_index] = 1;
                     });
 
                     PlacedShip = !PlacedShip;
@@ -148,7 +148,7 @@ const PlaceRandomShips = () => {
 
                 if (Available) {
                     AvailablePlacesIndex.map(available_row_index => {
-                        GameBoard[available_row_index][ShipRenderInitCell] = ShipWidth;
+                        GameBoard[available_row_index][ShipRenderInitCell] = 1;
                     });
 
                     PlacedShip = !PlacedShip;
